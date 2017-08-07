@@ -1,0 +1,19 @@
+body{
+	background-image: url("../images/subtle_grunge.png");
+}
+
+h1{
+	font-size: 50px;
+}
+
+#myHeader{
+	background-image: url("../images/mochaGrunge.png");
+}
+
+.mySmall{
+	color:#f2f2f2;
+}
+
+.page-header{
+	border-bottom: none;
+}
