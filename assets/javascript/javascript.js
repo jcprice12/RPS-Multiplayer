@@ -78,7 +78,7 @@ $(document).ready(function(){
 	$("#newSessionButton").on("click", function(){
 		var sessionName = $("#sessionNameInput").val().trim();
 		if(sessionName){
-			database.ref("sessions/").on("value", function(snapshot){
+			database.ref("sessions/").once("value", function(snapshot){
 				if(!snapshot.hasChild(sessionName)){
 					var sessionRef = "sessions/" + sessionName;
 					var session = database.ref(sessionRef);
@@ -90,6 +90,7 @@ $(document).ready(function(){
 						choice: null,
 						wins: 0,
 						losses: 0,
+						ties: 0,
 					});
 				} else {
 					alert("The session name " + "\"" + sessionName + "\"" + " already exists");
@@ -102,7 +103,32 @@ $(document).ready(function(){
 
 	$(document).on("click", ".sessionRow", function(){
 		var sessionName = $(this).data("session-name");
-		alert(sessionName);
+		var sessionRef = "sessions/" + sessionName;
+		database.ref(sessionRef).once("value", function(snapshot){
+			var user = authorization.currentUser;
+			var email = user.email;
+			if(!snapshot.hasChild("player1")){
+				var player1 = database.ref(sessionRef).child("player1");
+				player1.set({
+					playerEmail: email,
+					choice: null,
+					wins: 0,
+					losses: 0,
+					ties: 0,
+				});
+			} else if(!snapshot.hasChild("player2")){
+				var player2 = database.ref(sessionRef).child("player2");
+				player2.set({
+					playerEmail: email,
+					choice: null,
+					wins: 0,
+					losses: 0,
+					ties: 0,
+				});
+			} else {
+				alert("You cannot join " + sessionName + ". There are already two players in it.");
+			}
+		});
 	});
 
 	database.ref("sessions").on("value", function(snapshot) {
@@ -111,8 +137,18 @@ $(document).ready(function(){
       sessionsTable.html("");
       sessionsTable.append(buildSessionsTableHeader());
       for(key in snapshot.val()){
-      	var player1 = snapshot.val()[key].player1.playerEmail;
-      	var player2 = "";
+      	var player1;
+      	var player2;
+      	if(snapshot.val()[key].player1){
+      		player1 = snapshot.val()[key].player1.playerEmail;
+      	} else {
+      		player1 = "";
+      	}
+      	if(snapshot.val()[key].player2){
+      		player2 = snapshot.val()[key].player2.playerEmail;
+      	} else {
+      		player2 = "";
+      	}
       	sessionsTable.append(buildSessionsTableRow(key,player1,player2));
       }
     }, function(errorObject) {

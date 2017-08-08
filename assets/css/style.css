@@ -5,6 +5,22 @@ body{
 h1{
 	font-size: 50px;
 }
+td, th {    
+    border-bottom: 1px solid #2f2f2f;
+}
+table{
+	margin-top: 20px;
+	width:100%;
+	border: 1px solid #2f2f2f;
+}
+th, td {
+    padding: 15px;
+}
+th{
+	background-image: url("../images/mochaGrunge.png");
+	color:#f2f2f2;
+}
+
 
 #myHeader{
 	background-image: url("../images/mochaGrunge.png");
@@ -12,6 +28,11 @@ h1{
 
 .mySmall{
 	color:#f2f2f2;
+}
+
+.sessionRow:hover{
+	cursor: pointer;
+	background-color: #ccc;
 }
 
 .page-header{
