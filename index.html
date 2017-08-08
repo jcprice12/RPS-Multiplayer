@@ -17,12 +17,25 @@
 	  	</div>
 	</div>
 	<div id="bodyContainer" class="container">
-		<div id="formContainer">
+		<div id="userFormContainer">
 			<input id="emailInput" type="email" placeholder="Email">
 			<input id="passwordInput" type="password" placeholder="Password">
 			<button id="loginButton">Sign In</button>
 			<button id="signUpButton">Sign Up</button>
 			<button id="logOutButton">Sign Out</button>
+		</div>
+		<div id="sessionsTableContainer">
+			<div id="newSessionFormContainer">
+				<input id="sessionNameInput" placeholder="Session Name" type="text">
+				<button id="newSessionButton">Submit</button>
+			</div>
+			<table id="sessionsTable">
+				<tr>
+					<th>
+						Session Name
+					</th>
+				</tr>
+			</table>
 		</div>
 	</div>
 	<script src="https://www.gstatic.com/firebasejs/4.2.0/firebase.js"></script>
