@@ -1,9 +1,22 @@
 body{
 	background-image: url("../images/subtle_grunge.png");
+	padding:0;
 }
 
 h1{
 	font-size: 50px;
+}
+h2{
+	padding:20px;
+	font-size: 25px;
+	margin-bottom: 0;
+	margin-top: 0;
+}
+h3{
+	margin-bottom: 0;
+	margin-top: 0;
+	padding:15px;
+	font-size: 20px;
 }
 td, th {    
     border-bottom: 1px solid #2f2f2f;
@@ -12,29 +25,106 @@ table{
 	margin-top: 20px;
 	width:100%;
 	border: 1px solid #2f2f2f;
+	background:#f2f2f2;
 }
 th, td {
     padding: 15px;
 }
 th{
-	background-image: url("../images/mochaGrunge.png");
+	background:#2f2f2f;
 	color:#f2f2f2;
 }
 
 
-#myHeader{
+.box{
+	margin-top: 20px;
+}
+
+.boxBody{
+	background: #f2f2f2;
+	color:#2f2f2f;
+	font-size: 16px;
+	line-height: 1.8;
+}
+
+.boxHeader{
+	background:#2f2f2f;
+	color:#f2f2f2;
+}
+
+.choiceDiv{
+	padding:15px;
+}
+
+.choiceDiv:hover,
+.choiceDiv:active{
+	background:#ccc;
+	cursor:pointer;
+}
+
+.gameRoom{
+	border-radius: 4px;
+	margin-top: 20px;
 	background-image: url("../images/mochaGrunge.png");
+	margin-bottom: 20px;
+	border:1px solid #2f2f2f;
+}
+
+.gameRoomChat{
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.gameRoomHeader{
+	background:#2f2f2f;
+	color:#f2f2f2;
+}
+
+.messageFormContainer{
+	width:100%;
+}
+
+.messageHistory{
+	height:200px;
+	width:100%;
+	background: #f2f2f2;
+}
+
+.messageInput{
+	padding:5px;
+	border:none;
+}
+
+#messageSendButton{
+	float:right;
+	width:10%;
+}
+
+#messageTextInput{
+	float:left;
+	width:90%;
+}
+
+
+#myHeader{
+	/*background-image: url("../images/mochaGrunge.png");*/
+	background:#2f2f2f;
 }
 
 .mySmall{
 	color:#f2f2f2;
 }
 
+.page-header{
+	border-bottom: none;
+}
+
+.resultDiv{
+	text-align: center;
+	height:174px;
+}
+
 .sessionRow:hover{
 	cursor: pointer;
 	background-color: #ccc;
-}
-
-.page-header{
-	border-bottom: none;
 }

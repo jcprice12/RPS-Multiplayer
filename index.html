@@ -30,7 +30,87 @@
 				<button id="newSessionButton">Submit</button>
 			</div>
 			<table id="sessionsTable">
+				<thead>
+					<tr>
+						<th>
+							Session Name
+						</th>
+						<th>
+							Player 1
+						</th>
+						<th>
+							Player 2
+						</th>
+					</tr>
+				</thead>
+				<tbody id="sessionsTableBody">
+					
+				</tbody>
 			</table>
+		</div>
+		<div class="gameRoom">
+			<div class="gameRoomHeader">
+				<h2>Session 1</h1>
+			</div>
+			<div class="gameRoomBody">
+				<div class="row container-fluid">
+					<div class="box player1 col-xs-12 col-sm-12 col-md-4">
+						<div class="boxHeader">
+							<h3>Player 1</h3>
+						</div>
+						<div class="boxBody">
+							<div class="choiceDiv">
+								Rock
+							</div>
+							<div class="choiceDiv">
+								Paper
+							</div>
+							<div class="choiceDiv">
+								Scissors
+							</div>
+						</div>
+					</div>
+					<div class="box resultBox col-xs-12 col-sm-12 col-md-4">
+						<div class="boxHeader">
+							<h3>Result</h3>
+						</div>
+						<div class="boxBody">
+							<div class="resultDiv">
+								Player 1 Won!
+							</div>
+						</div>
+					</div>
+					<div class="box player2 col-xs-12 col-sm-12 col-md-4">
+						<div class="boxHeader">
+							<h3>Player 2</h3>
+						</div>
+						<div class="boxBody">
+							<div class="choiceDiv">
+								Rock
+							</div>
+							<div class="choiceDiv">
+								Paper
+							</div>
+							<div class="choiceDiv">
+								Scissors
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row container-fluid">
+					<div class="gameRoomChat col-xs-12">
+						<div class="boxHeader">
+							<h3>Chat</h3>
+						</div>
+						<div class="messageHistory">
+						</div>
+						<form class="messageFormContainer">
+							<input id="messageTextInput" class="messageInput" type="text" placeholder="message">
+							<input id="messageSendButton" class="messageInput" type="submit" value="Submit">
+						</form>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 	<script src="https://www.gstatic.com/firebasejs/4.2.0/firebase.js"></script>

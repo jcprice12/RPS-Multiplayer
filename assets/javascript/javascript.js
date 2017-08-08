@@ -17,9 +17,10 @@ var authorization = firebase.auth();
  End Initialize Firebase
 ***********************************************************************************************************/
 
-function buildSessionsTableRow(name, player1, player2){
+function buildSessionsTableRow(key, name, player1, player2){
 	var tr = $("<tr>");
 	tr.attr("data-session-name", name);
+	tr.attr("data-session-key", key);
 	tr.addClass("sessionRow")
   	var sessionNameTd = $("<td>");
   	sessionNameTd.text(name);
@@ -33,109 +34,11 @@ function buildSessionsTableRow(name, player1, player2){
   	return tr;
 }
 
-function buildSessionsTableHeader(){
-	var tr = $("<tr>");
-	var sessionNameTh = $("<th>");
-	sessionNameTh.text("Session Name");
-	var player1Th = $("<th>");
-	player1Th.text("Player 1");
-	var player2Th = $("<th>");
-	player2Th.text("Player 2");
-	tr.append(sessionNameTh);
-	tr.append(player1Th);
-	tr.append(player2Th);
-	return tr;
-}
-
-
-$(document).ready(function(){
-	$("#signUpButton").on("click", function(){
-		const email = $("#emailInput").val();
-		const password = $("#passwordInput").val();
-		authorization.createUserWithEmailAndPassword(email, password).catch(function(error) {
-			var errorCode = error.code;
-			var errorMessage = error.message;
-			console.log("Error Code: " + error.code);
-			console.log("Error Message: " + error.message);
-		});
-	});
-
-	$("#loginButton").on("click", function(){
-		const email = $("#emailInput").val();
-		const password = $("#passwordInput").val();
-		authorization.signInWithEmailAndPassword(email, password).catch(function(error){
-			var errorCode = error.code;
-			var errorMessage = error.message;
-			console.log("Error Code: " + error.code);
-			console.log("Error Message: " + error.message);
-		});
-	});
-
-	$("#logOutButton").on("click", function(){
-		authorization.signOut();
-	});
-
-	$("#newSessionButton").on("click", function(){
-		var sessionName = $("#sessionNameInput").val().trim();
-		if(sessionName){
-			database.ref("sessions/").once("value", function(snapshot){
-				if(!snapshot.hasChild(sessionName)){
-					var sessionRef = "sessions/" + sessionName;
-					var session = database.ref(sessionRef);
-					var player1 = database.ref(sessionRef).child("player1");
-					var user = authorization.currentUser;
-					var email = user.email;
-					player1.set({
-						playerEmail: email,
-						choice: null,
-						wins: 0,
-						losses: 0,
-						ties: 0,
-					});
-				} else {
-					alert("The session name " + "\"" + sessionName + "\"" + " already exists");
-				}
-			}), function(errorObject){
-				console.log("The read failed: " + errorObject.code);
-			}
-		}
-	});
-
-	$(document).on("click", ".sessionRow", function(){
-		var sessionName = $(this).data("session-name");
-		var sessionRef = "sessions/" + sessionName;
-		database.ref(sessionRef).once("value", function(snapshot){
-			var user = authorization.currentUser;
-			var email = user.email;
-			if(!snapshot.hasChild("player1")){
-				var player1 = database.ref(sessionRef).child("player1");
-				player1.set({
-					playerEmail: email,
-					choice: null,
-					wins: 0,
-					losses: 0,
-					ties: 0,
-				});
-			} else if(!snapshot.hasChild("player2")){
-				var player2 = database.ref(sessionRef).child("player2");
-				player2.set({
-					playerEmail: email,
-					choice: null,
-					wins: 0,
-					losses: 0,
-					ties: 0,
-				});
-			} else {
-				alert("You cannot join " + sessionName + ". There are already two players in it.");
-			}
-		});
-	});
-
-	database.ref("sessions").on("value", function(snapshot) {
-      console.log(snapshot.val());//console log object (the value of the snapshot)
-      var sessionsTable = $("#sessionsTable");
-      sessionsTable.html("");
-      sessionsTable.append(buildSessionsTableHeader());
+//read the data and build table from it
+function buildSessionsTable(){
+	console.log("building sessions table...")
+	database.ref("sessions").once("value", function(snapshot) {
+      destroySessionsTableBody();
       for(key in snapshot.val()){
       	var player1;
       	var player2;
@@ -149,17 +52,107 @@ $(document).ready(function(){
       	} else {
       		player2 = "";
       	}
-      	sessionsTable.append(buildSessionsTableRow(key,player1,player2));
+      	$("#sessionsTableBody").append(buildSessionsTableRow(key, snapshot.val()[key].name,player1,player2));
       }
     }, function(errorObject) {
-      console.log("The read failed: " + errorObject.code);
+      console.log("Sessions read failed: " + errorObject.code);
     });
+}
+
+function destroySessionsTableBody(){
+	console.log("destroying sessions table");
+	$("#sessionsTableBody").html("");
+}
+
+function leaveGameRoom(){
+	console.log("leaving game room");
+	buildSessionsTable();
+}
+
+function buildGameRoom(){
+	console.log("building game room");
+}
+
+
+$(document).ready(function(){
+	$("#signUpButton").on("click", function(){
+		const email = $("#emailInput").val();
+		const password = $("#passwordInput").val();
+		authorization.createUserWithEmailAndPassword(email, password).catch(function(error) {
+			console.log("Could not sign up: " + error.code);
+		});
+	});
+
+	$("#loginButton").on("click", function(){
+		const email = $("#emailInput").val();
+		const password = $("#passwordInput").val();
+		authorization.signInWithEmailAndPassword(email, password).catch(function(error){
+			console.log("Could not log in: " + error.code);
+		});
+	});
+
+	$("#logOutButton").on("click", function(){
+		authorization.signOut();
+	});
+
+	$("#newSessionButton").on("click", function(){
+		var sessionName = $("#sessionNameInput").val().trim();
+		if(sessionName){
+			var sessionsRef = database.ref("sessions");
+			var newSession = sessionsRef.push({
+				name: sessionName,
+				player1 : {
+					playerEmail: authorization.currentUser.email,
+					choice: null,
+					wins: 0,
+					losses: 0,
+					ties: 0,
+				},
+			});
+			buildSessionsTable();
+		}
+	});
+
+	$(document).on("click", ".sessionRow", function(){
+		var key = $(this).data("session-key");
+		var sessionRef = "sessions/" + key;
+		database.ref(sessionRef).once("value", function(snapshot){
+			var user = authorization.currentUser;
+			var email = user.email;
+			if(!snapshot.hasChild("player1")){
+				var player1 = database.ref(sessionRef).child("player1");
+				player1.set({
+					playerEmail: email,
+					choice: null,
+					wins: 0,
+					losses: 0,
+					ties: 0,
+				});
+				buildGameRoom();
+			} else if(!snapshot.hasChild("player2")){
+				var player2 = database.ref(sessionRef).child("player2");
+				player2.set({
+					playerEmail: email,
+					choice: null,
+					wins: 0,
+					losses: 0,
+					ties: 0,
+				});
+				buildGameRoom();
+			} else {
+				alert("You cannot join " + snapshot.val().name + ". There are already two players in it.");
+			}
+			buildSessionsTable();
+		});
+	});
 
 	authorization.onAuthStateChanged(function(myUser){
 		if(myUser){
-			console.log(myUser);
+			console.log("user " + myUser.email + " has loggeed in");
+			buildSessionsTable();
 		} else {
-			console.log("not logged in");
+			console.log("a user is not logged in");
+			destroySessionsTableBody();
 		}
 	});
 });
