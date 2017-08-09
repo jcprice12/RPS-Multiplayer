@@ -440,7 +440,7 @@ $(document).ready(function(){
 	});
 
 	database.ref("sessions/" + currentSession.sessionKey).on("value", function(){
-		$()
+		$
 	}, function(error){
 		console.log("error while listening on session: " + currentSession.sessionKey);
 		console.log(error.code);
