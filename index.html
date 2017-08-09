@@ -59,21 +59,34 @@
 			</div>
 			<div class="gameRoomBody">
 				<div class="row container-fluid">
-					<div id="currentPlayer" class="box playerBox col-xs-12 col-sm-12 col-md-4">
+					<div id="player1Box" class="box playerBox col-xs-12 col-sm-12 col-md-4">
 						<div class="boxHeader">
 							<h3 id="player1GameName">
 								<!-- player name Goes here -->
 							</h3>
 						</div>
-						<div class="boxBody">
-							<div class="myChoiceDiv choiceDiv" data-choice="rock">
-								Rock
-							</div>
-							<div class="myChoiceDiv choiceDiv" data-choice="paper">
-								Paper
-							</div>
-							<div class="myChoiceDiv choiceDiv" data-choice="scissors">
-								Scissors
+						<div id="player1BoxBody" class="boxBody">
+							<!-- <div class="choicesContainer">
+								<div class="myChoiceDiv choiceDiv" data-choice="rock">
+									Rock
+								</div>
+								<div class="myChoiceDiv choiceDiv" data-choice="paper">
+									Paper
+								</div>
+								<div class="myChoiceDiv choiceDiv" data-choice="scissors">
+									Scissors
+								</div>
+							</div> -->
+							<div id="player1InformationContainer" class="playerInformationContainer">
+								<div class="playerInfo">
+									Wins: 0
+								</div>
+								<div class="playerInfo">
+									Losses: 0
+								</div>
+								<div class="playerInfo">
+									Ties: 0
+								</div>
 							</div>
 						</div>
 					</div>
@@ -87,21 +100,34 @@
 							</div>
 						</div>
 					</div>
-					<div id="otherPlayer" class="box playerBox col-xs-12 col-sm-12 col-md-4">
+					<div id="player2Box" class="box playerBox col-xs-12 col-sm-12 col-md-4">
 						<div class="boxHeader">
 							<h3 id="player2GameName">
 								<!-- player name Goes here -->				
 							</h3>
 						</div>
-						<div class="boxBody">
-							<div class="choiceDiv" data-choice="rock">
-								Rock
-							</div>
-							<div class="choiceDiv" data-choice="paper">
-								Paper
-							</div>
-							<div class="choiceDiv" data-choice="scissors">
-								Scissors
+						<div id="player2BoxBody" class="boxBody">
+							<!-- <div class="choicesContainer">
+								<div class="choiceDiv" data-choice="rock">
+									Rock
+								</div>
+								<div class="choiceDiv" data-choice="paper">
+									Paper
+								</div>
+								<div class="choiceDiv" data-choice="scissors">
+									Scissors
+								</div>
+							</div> -->
+							<div id="player2InformationContainer" class="playerInformationContainer">
+								<div class="playerInfo">
+									Wins: 0
+								</div>
+								<div class="playerInfo">
+									Losses: 0
+								</div>
+								<div class="playerInfo">
+									Ties: 0
+								</div>
 							</div>
 						</div>
 					</div>

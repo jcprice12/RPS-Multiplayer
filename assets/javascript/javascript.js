@@ -74,19 +74,81 @@ function compareChoices(currentSession,player1Choice, player2Choice){
 	if(player1Choice === player2Choice){
 		currentSession.player1.ties++;
 		currentSession.player2.ties++;
+		buildResultContent("Tie Game!");
 	} else if((player1Choice === "rock" && player2Choice === "scissors") ||
 		(player1Choice === "paper" && player2Choice === "rock") ||
 		(player1Choice === "scissors" && player2Choice === "paper")){
 		currentSession.player1.wins++;
 		currentSession.player2.losses++;
 		console.log("player 1 won");
+		buildResultContent(currentSession.player1.playerEmail + " has won!");
 	} else {
 		currentSession.player1.losses++;
 		currentSession.player2.wins++;
 		console.log("player 2 won");
+		buildResultContent(currentSession.player2.playerEmail + " has won!");
 	}
 	currentSession.player1.choice = null;
 	currentSession.player2.choice = null;
+}
+
+function buildResultContent(message){
+	$("#resultContent").html("");
+	$("#resultContent").text(message);
+}
+
+function buildChoice(choice){
+	var playerChoice = $("<div>");
+	playerChoice.addClass("myChoice");
+	playerChoice.html(choice);
+	playerChoice.attr("data-choice", choice.toLowerCase());
+	return playerChoice;
+}
+
+function buildPlayerInformation(player){
+	console.log("building player info:");
+	var playerInfo = $("<div>");
+	playerInfo.addClass("playerInformationContainer");
+	if(player){
+		playerInfo.append($("<div>").addClass("playerInfo").text("Wins: " + player.wins));
+		playerInfo.append($("<div>").addClass("playerInfo").text("Losses: " + player.losses));
+		playerInfo.append($("<div>").addClass("playerInfo").text("Ties: " + player.ties));
+	} else {
+		playerInfo.append($("<div>").addClass("playerInfo").text("Wins: " + 0));
+		playerInfo.append($("<div>").addClass("playerInfo").text("Losses: " + 0));
+		playerInfo.append($("<div>").addClass("playerInfo").text("Ties: " + 0));
+	}
+	return playerInfo;
+}
+
+function buildOtherChoiceSection(myMessage){
+	var choiceContainer = $("<div>");
+	choiceContainer.addClass("choicesContainer");
+	var message = $("<div>");
+	message.addClass("finalChoice");
+	message.text(myMessage);
+	choiceContainer.append(message);
+	return choiceContainer;
+}
+
+function buildChoiceContainer(){
+	var choiceContainer = $("<div>");
+	choiceContainer.addClass("choicesContainer");
+	choiceContainer.append(buildChoice("Rock"));
+	choiceContainer.append(buildChoice("Paper"));
+	choiceContainer.append(buildChoice("Scissors"));
+	return choiceContainer;
+}
+
+function buildPlayerBoxBody(boxBody, player, amPlayer, message){
+	boxBody.html("");
+	if(amPlayer){
+		boxBody.append(buildChoiceContainer());
+	} else {
+		boxBody.append(buildOtherChoiceSection(message));
+	}
+	boxBody.append(buildPlayerInformation(player));
+	
 }
 
 function buildSessionsTableRow(key, name, player1, player2){
@@ -154,10 +216,22 @@ function showGameRoom(){
 
 function updatePlayer1Info(player1){
 	console.log("updating player 1 info");
+	$("#player1GameName").text(player1.playerEmail);
+	if(currentSession.iAm === "player1"){
+		buildPlayerBoxBody($("#player1BoxBody"),player1,true, "");
+	} else {
+		buildPlayerBoxBody($("#player1BoxBody"),player1,false, "Waiting for Player to Choose");
+	}
 }
 
 function updatePlayer2Info(player2){
 	console.log("updating player 2 info");
+	$("#player2GameName").text(player2.playerEmail);
+	if(currentSession.iAm === "player2"){
+		buildPlayerBoxBody($("#player2BoxBody"),player2,true, "");
+	} else {
+		buildPlayerBoxBody($("#player2BoxBody"),player2,false, "Waiting for Player to Choose");
+	}
 }
 
 function enterGameRoom(key, iAmPlayer1){
@@ -170,8 +244,16 @@ function enterGameRoom(key, iAmPlayer1){
 		currentSession.player2 = session.player2;
 		if(iAmPlayer1){
 			currentSession.iAm = "player1";
+			buildPlayerBoxBody($("#player2BoxBody"),session.player2,false, "Waiting for Player to Choose");
+			buildPlayerBoxBody($("#player1BoxBody"),session.player1,true, "");
+			//$("#player1BoxBody").prepend(buildChoiceContainer($("#player1BoxBody")));
+			//$("#player2BoxBody").prepend(buildOtherChoiceSection($("#player2BoxBody"), "Waiting for Player's Choice"));
 		} else {
 			currentSession.iAm = "player2";
+			buildPlayerBoxBody($("#player2BoxBody"),session.player2,true, "");
+			buildPlayerBoxBody($("#player1BoxBody"),session.player1,false, "Waiting for Player to Choose");
+			//$("#player2BoxBody").prepend(buildChoiceContainer($("#player2BoxBody"),));
+			//$("#player1BoxBody").prepend(buildOtherChoiceSection($("#player1BoxBody"), "Waiting for Player's Choice"));
 		}
 
 		hideSessionsTable();
@@ -209,6 +291,10 @@ function createGameRoom(key){
 		currentSession.player2 = null;
 		currentSession.iAm = "player1";
 		hideSessionsTable();
+		//$("#player1BoxBody").prepend(buildChoiceContainer($("#player1BoxBody")));
+		//$("#player2BoxBody").prepend(buildOtherChoiceSection($("#player2BoxBody"), "Waiting for Player's Choice"));
+		buildPlayerBoxBody($("#player2BoxBody"),session.player2,false, "Waiting for Player to Choose");
+		buildPlayerBoxBody($("#player1BoxBody"),session.player1,true, "");
 		$("#gameSessionName").text(session.name);
 		$("#player1GameName").text(session.player1.playerEmail);
 		//initialize wins, losses, and ties as well
@@ -220,7 +306,7 @@ function createGameRoom(key){
 		showGameRoom();
 
 	}, function(error){
-		console.log("There was an error while creating a new session and joing the game room");
+		console.log("There was an error while creating a new session and joining the game room");
 		console.log(error.code);
 		currentSession.sessionKey = null;
 		currentSession.player1 = null;
@@ -350,7 +436,7 @@ $(document).ready(function(){
 		});
 	});
 
-	$(document).on("click", ".choiceDiv", function(){
+	$(document).on("click", ".myChoice", function(){
 		//console.log(currentSession[currentSession.iAm].choice);
 		if(!currentSession[currentSession.iAm].choice){
 			var thisChoice = $(this).data("choice");
@@ -362,27 +448,34 @@ $(document).ready(function(){
 	});
 
 	database.ref("sessions").on("child_changed", function(snapshot){
+		console.log(snapshot);
 		console.log(snapshot.val());
-		var session = snapshot.val();
-		if(currentSession.sessionKey){
-			if(session.player1){
-				currentSession.player1 = session.player1;
-				updatePlayer1Info(session.player1);
-			}
-			if(session.player2){
-				currentSession.player2 = session.player2
-				updatePlayer2Info(session.player2);
-			}
-			if(session.player1 && session.player2){
-				if(session.player1.choice && session.player2.choice){
-					compareChoices(currentSession, session.player1.choice, session.player2.choice);
-					database.ref("sessions/" + currentSession.sessionKey).set({
-						name: currentSession.sessionName,
-						player1: currentSession.player1,
-						player2: currentSession.player2,
-					});
+		if(snapshot.key === currentSession.sessionKey){
+			var session = snapshot.val();
+			if(currentSession.sessionKey){
+				if(session.player1){
+					currentSession.player1 = session.player1;
+					updatePlayer1Info(session.player1);
 				} else {
-					console.log("waiting for both users to choose still");
+
+				}
+				if(session.player2){
+					currentSession.player2 = session.player2
+					updatePlayer2Info(session.player2);
+				} else {
+
+				}
+				if(session.player1 && session.player2){
+					if(session.player1.choice && session.player2.choice){
+						compareChoices(currentSession, session.player1.choice, session.player2.choice);
+						database.ref("sessions/" + currentSession.sessionKey).set({
+							name: currentSession.sessionName,
+							player1: currentSession.player1,
+							player2: currentSession.player2,
+						});
+					} else {
+						console.log("waiting for both users to choose still");
+					}
 				}
 			}
 		}

@@ -52,12 +52,26 @@ th{
 	color:#f2f2f2;
 }
 
-.choiceDiv{
+/*.choiceDiv{
+	padding:15px;
+}*/
+
+.choicesContainer{
+	border-bottom: 1px solid #2f2f2f;
+}
+
+/*.choiceDiv:hover,
+.choiceDiv:active{
+	background:#ccc;
+	cursor:pointer;
+}*/
+
+.myChoice{
 	padding:15px;
 }
 
-.choiceDiv:hover,
-.choiceDiv:active{
+.myChoice:hover,
+.myCHoice:active{
 	background:#ccc;
 	cursor:pointer;
 }
@@ -81,6 +95,10 @@ th{
 	cursor: pointer;
 	background: #c92626;
 	color:#f2f2f2;
+}
+
+.finalChoice{
+	padding:15px;
 }
 
 .gameRoom{
@@ -145,9 +163,12 @@ th{
 	border-bottom: none;
 }
 
+.playerInfo{
+	padding:15px;
+}
+
 .resultDiv{
 	text-align: center;
-	height:174px;
 }
 
 .sessionRow:hover{
