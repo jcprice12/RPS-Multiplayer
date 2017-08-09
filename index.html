@@ -48,24 +48,31 @@
 				</tbody>
 			</table>
 		</div>
-		<div class="gameRoom">
+		<div id="myGameRoom" class="gameRoom">
 			<div class="gameRoomHeader">
-				<h2>Session 1</h1>
+				<h2 id="gameSessionName" >
+					<!-- session name goes here-->
+				</h2>
+				<div id="thisCloseButton" class="closeButton">
+					X
+				</div>
 			</div>
 			<div class="gameRoomBody">
 				<div class="row container-fluid">
-					<div class="box player1 col-xs-12 col-sm-12 col-md-4">
+					<div id="currentPlayer" class="box playerBox col-xs-12 col-sm-12 col-md-4">
 						<div class="boxHeader">
-							<h3>Player 1</h3>
+							<h3 id="player1GameName">
+								<!-- player name Goes here -->
+							</h3>
 						</div>
 						<div class="boxBody">
-							<div class="choiceDiv">
+							<div class="myChoiceDiv choiceDiv" data-choice="rock">
 								Rock
 							</div>
-							<div class="choiceDiv">
+							<div class="myChoiceDiv choiceDiv" data-choice="paper">
 								Paper
 							</div>
-							<div class="choiceDiv">
+							<div class="myChoiceDiv choiceDiv" data-choice="scissors">
 								Scissors
 							</div>
 						</div>
@@ -75,23 +82,25 @@
 							<h3>Result</h3>
 						</div>
 						<div class="boxBody">
-							<div class="resultDiv">
-								Player 1 Won!
+							<div id="resultContent" class="resultDiv">
+								<!-- Result Goes here -->
 							</div>
 						</div>
 					</div>
-					<div class="box player2 col-xs-12 col-sm-12 col-md-4">
+					<div id="otherPlayer" class="box playerBox col-xs-12 col-sm-12 col-md-4">
 						<div class="boxHeader">
-							<h3>Player 2</h3>
+							<h3 id="player2GameName">
+								<!-- player name Goes here -->				
+							</h3>
 						</div>
 						<div class="boxBody">
-							<div class="choiceDiv">
+							<div class="choiceDiv" data-choice="rock">
 								Rock
 							</div>
-							<div class="choiceDiv">
+							<div class="choiceDiv" data-choice="paper">
 								Paper
 							</div>
-							<div class="choiceDiv">
+							<div class="choiceDiv" data-choice="scissors">
 								Scissors
 							</div>
 						</div>
@@ -103,6 +112,7 @@
 							<h3>Chat</h3>
 						</div>
 						<div class="messageHistory">
+							<!-- Message History Goes Here -->
 						</div>
 						<form class="messageFormContainer">
 							<input id="messageTextInput" class="messageInput" type="text" placeholder="message">
