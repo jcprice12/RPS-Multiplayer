@@ -57,7 +57,9 @@ function deleteStuff(signOut){
 								currentSession.player2 = null;
 								hideGameRoom();
 								showSessionsTableContainer();
+								console.log("I'm deleting chat");
 								if(signOut){
+									console.log("I'm signing out");
 									authorization.signOut();
 								}
 								// console.log("deleted entire session and chat");
@@ -74,6 +76,9 @@ function deleteStuff(signOut){
 						showSessionsTableContainer();
 						console.log("deleted player from session");
 						console.log(currentSession);
+						if(signOut){
+							authorization.signOut();
+						}
 					}
 				}, function(error){
 					console.log("Error reading session " + currentSession.sessionKey + " during delete of player");
@@ -488,61 +493,73 @@ $(document).ready(function(){
 	$(document).on("click", ".sessionRow", function(){
 		var key = $(this).data("session-key");
 		var sessionRef = "sessions/" + key;
-		database.ref(sessionRef).once("value", function(snapshot){
-			var user = authorization.currentUser;
-			var email = user.email;
-			if(!snapshot.hasChild("player1")){
-				//if(snapshot.val().player2.playerEmail !== email){
-					var player1 = database.ref(sessionRef).child("player1");
-					player1.set({
-						playerEmail: email,
-						choice: null,
-						wins: 0,
-						losses: 0,
-						ties: 0,
-					});
+		database.ref("sessions/").once("value", function(snapshot){
+			if(snapshot.hasChild(key)){
+				database.ref(sessionRef).once("value", function(snapshot){
+					console.log(snapshot);
+					//if(snapshot)
+					var user = authorization.currentUser;
+					var email = user.email;
+					if(!snapshot.hasChild("player1")){
+						//if(snapshot.val().player2.playerEmail !== email){
+							var player1 = database.ref(sessionRef).child("player1");
+							player1.set({
+								playerEmail: email,
+								choice: null,
+								wins: 0,
+								losses: 0,
+								ties: 0,
+							});
 
-					var userRef = database.ref("usersInformation/" + user.uid);
-					userRef.set({
-						sessionKey: key,
-					});
-					// player1.onDisconnect().remove(function(error){
-					// 	if(!currentSession.player2){
-					// 		var mySessionRef = database.ref("sessions/" + newSession.key);
-					// 		mySessionRef.remove();
-					// 	}
-					// });
-					enterGameRoom(key,true);					
-				//}
-			} else if(!snapshot.hasChild("player2")){
-				//if(snapshot.val().player1.playerEmail !== email){
-					var player2 = database.ref(sessionRef).child("player2");
-					player2.set({
-						playerEmail: email,
-						choice: null,
-						wins: 0,
-						losses: 0,
-						ties: 0,
-					});
+							var userRef = database.ref("usersInformation/" + user.uid);
+							userRef.set({
+								sessionKey: key,
+							});
+							// player1.onDisconnect().remove(function(error){
+							// 	if(!currentSession.player2){
+							// 		var mySessionRef = database.ref("sessions/" + newSession.key);
+							// 		mySessionRef.remove();
+							// 	}
+							// });
+							enterGameRoom(key,true);					
+						//}
+					} else if(!snapshot.hasChild("player2")){
+						//if(snapshot.val().player1.playerEmail !== email){
+							var player2 = database.ref(sessionRef).child("player2");
+							player2.set({
+								playerEmail: email,
+								choice: null,
+								wins: 0,
+								losses: 0,
+								ties: 0,
+							});
 
-					var userRef = database.ref("usersInformation/" + user.uid);
-					userRef.set({
-						sessionKey: key,
-					});
-					// player2.onDisconnect().remove(function(error){
-					// 	if(!currentSession.player1){
-					// 		var mySessionRef = database.ref("sessions/" + newSession.key);
-					// 		mySessionRef.remove();
-					// 	}
-					// });
-					enterGameRoom(key,false);
-				//}
+							var userRef = database.ref("usersInformation/" + user.uid);
+							userRef.set({
+								sessionKey: key,
+							});
+							// player2.onDisconnect().remove(function(error){
+							// 	if(!currentSession.player1){
+							// 		var mySessionRef = database.ref("sessions/" + newSession.key);
+							// 		mySessionRef.remove();
+							// 	}
+							// });
+							enterGameRoom(key,false);
+						//}
+					} else {
+						buildSessionsTable();
+						alert("You cannot join " + snapshot.val().name + ". There are already two players in the game room.");
+					}
+				}, function(error){
+					console.log("Error while clicking session row");
+					console.log(error.code);
+				});
 			} else {
+				alert("That session no longer exists");
 				buildSessionsTable();
-				alert("You cannot join " + snapshot.val().name + ". There are already two players in the game room.");
 			}
 		}, function(error){
-			console.log("Error while clicking session row");
+			console.log("Error resading sessions to join a game");
 			console.log(error.code);
 		});
 	});
@@ -556,6 +573,7 @@ $(document).ready(function(){
 	});
 
 	$(document).on("click", ".myChoice", function(){
+		console.log("choosing");
 		if(currentSession.player1 && currentSession.player2){
 			if(!currentSession[currentSession.iAm].choice){
 				var thisChoice = $(this).data("choice");
@@ -568,9 +586,40 @@ $(document).ready(function(){
 	});
 
 	database.ref("sessions").on("child_changed", function(snapshot){
+		console.log("sessions changed");
 		if(snapshot.key === currentSession.sessionKey){
 			var session = snapshot.val();
 			if(currentSession.sessionKey){
+				var currentPlayer = currentSession.iAm;
+				currentSession.player1 = session.player1;
+				updatePlayer1Info();
+				currentSession.player2 = session.player2
+				updatePlayer2Info();
+				if(session.player1 && session.player2){
+					if(session.player1.choice && session.player2.choice){
+						compareChoices(currentSession, session.player1.choice, session.player2.choice);
+						database.ref("sessions/" + currentSession.sessionKey).set({
+							name: currentSession.sessionName,
+							player1: currentSession.player1,
+							player2: currentSession.player2,
+						});
+					} else {
+						console.log("waiting for both users to choose still");
+					}
+				}
+			}
+		}
+	}, function(error){
+		console.log("error while listening on session: " + currentSession.sessionKey);
+		console.log(error.code);
+	});
+
+	database.ref("sessions").on("child_added", function(snapshot){
+		console.log("sessions added");
+		if(snapshot.key === currentSession.sessionKey){
+			var session = snapshot.val();
+			if(currentSession.sessionKey){
+				var currentPlayer = currentSession.iAm;
 				currentSession.player1 = session.player1;
 				updatePlayer1Info();
 				currentSession.player2 = session.player2
