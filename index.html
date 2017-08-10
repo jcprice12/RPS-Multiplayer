@@ -29,6 +29,9 @@
 				<input id="sessionNameInput" placeholder="Session Name" type="text">
 				<button id="newSessionButton">Submit</button>
 			</div>
+			<button id="refreshSessionsTableButton">
+				Refresh
+			</button>
 			<table id="sessionsTable">
 				<thead>
 					<tr>
@@ -93,7 +96,7 @@
 						<div class="boxHeader">
 							<h3>Chat</h3>
 						</div>
-						<div class="messageHistory">
+						<div id="messageHistoryBox" class="messageHistory">
 							<!-- Message History Goes Here -->
 						</div>
 						<form class="messageFormContainer">

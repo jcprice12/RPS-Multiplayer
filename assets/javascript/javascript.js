@@ -31,6 +31,50 @@ var currentSession = {
 End Current Session Object
 **********************************************************************************************************/
 
+function deleteStuff(){
+	var ref = database.ref("sessions/" + currentSession.sessionKey + "/" + currentSession.iAm);
+	ref.remove(function(error){
+		var sessionRef = database.ref("sessions/" + currentSession.sessionKey);
+		sessionRef.once("value", function(snapshot){
+			var session = snapshot.val();
+			if(!(session.player1) && !(session.player2)){
+				sessionRef.remove(function(error){
+					var chatRef = database.ref("chats/" + currentSession.sessionKey);
+					chatRef.remove(function(error){
+						currentSession.sessionName = null;
+						currentSession.sessionKey = null;
+						currentSession.player1 = null;
+						currentSession.iAm = null;
+						currentSession.player2 = null;
+						hideGameRoom();
+						showSessionsTableContainer();
+						console.log("deleted entire session and chat");
+						console.log(currentSession);
+					});
+				});
+			} else {
+				currentSession.sessionName = null;
+				currentSession.sessionKey = null;
+				currentSession.player1 = null;
+				currentSession.iAm = null;
+				currentSession.player2 = null;
+				hideGameRoom();
+				showSessionsTableContainer();
+				console.log("deleted player from session");
+				console.log(currentSession);
+			}
+		}, function(error){
+			console.log("Error reading session " + currentSession.sessionKey + " during delete of player");
+			console.log(error.code);
+		});
+	});
+}
+
+function buildChatMessage(userEmail, message){
+	var p = (userEmail + ": " + message);
+	return p;
+}
+
 function buildVictoryScreen(p1, p2, resultMessage){
 	$("#resultContent").html("");
 	var infoContainer = $("<div>");
@@ -145,7 +189,7 @@ function buildSessionsTableRow(key, name, player1, player2){
 
 //read the data and build table from it
 function buildSessionsTable(){
-	console.log("building sessions table...")
+	console.log("building sessions table")
 	database.ref("sessions").once("value", function(snapshot) {
       destroySessionsTableBody();
       for(key in snapshot.val()){
@@ -192,7 +236,6 @@ function showGameRoom(){
 function updatePlayer1Info(){
 	console.log("updating player 1 info");
 	var player1 = currentSession.player1;
-	console.log(player1);
 	if(player1){
 		$("#player1GameName").text(player1.playerEmail);
 		if(currentSession.iAm === "player1"){
@@ -213,7 +256,6 @@ function updatePlayer1Info(){
 function updatePlayer2Info(){
 	console.log("updating player 2 info");
 	var player2 = currentSession.player2;
-	console.log(player2);
 	if(player2){
 		$("#player2GameName").text(player2.playerEmail);
 		if(currentSession.iAm === "player2"){
@@ -229,6 +271,23 @@ function updatePlayer2Info(){
 		$("#player2GameName").text("Awaiting Player");
 		$("#player2BoxBody").html("");
 	}
+}
+
+function buildMessageHistory(){
+	console.log("building message history");
+	var myHistory = document.getElementById("messageHistoryBox");
+	database.ref("chats/" + currentSession.sessionKey).once("value", function(snap){
+		$(myHistory).html("");
+		for(myKey in snap.val()){
+			var p = $("<p>");
+			p.text(snap.val()[myKey].message);
+			$(myHistory).append(p);
+		}
+		myHistory.scrollTop = myHistory.scrollHeight;
+	}, function(error){
+		console.log("There was an error reading chat history");
+		console.log(error.code);
+	});
 }
 
 function enterGameRoom(key, iAmPlayer1){
@@ -250,17 +309,13 @@ function enterGameRoom(key, iAmPlayer1){
 		hideSessionsTable();
 		$("#gameSessionName").text(currentSession.sessionName);		
 		$("#resultContent").text("");
-
+		buildMessageHistory();
 		showGameRoom();
 		
 	}, function(error){
 		console.log("There was an error while entering the game room");
 		console.log(error.code);
-		currentSession.sessionKey = null;
-		currentSession.player1 = null;
-		currentSession.player2 = null;
-		currentSession.iAm = null;
-		currentSession.sessionName = null;
+		deleteStuff();
 	});
 }
 
@@ -281,17 +336,13 @@ function createGameRoom(key){
 		updatePlayer2Info();
 		$("#gameSessionName").text(currentSession.sessionName);
 		$("#resultContent").text("");
-
+		buildMessageHistory();
 		showGameRoom();
 
 	}, function(error){
 		console.log("There was an error while creating a new session and joining the game room");
 		console.log(error.code);
-		currentSession.sessionKey = null;
-		currentSession.player1 = null;
-		currentSession.player2 = null;
-		currentSession.iAm = null;
-		currentSession.sessionName = null;
+		deleteStuff();
 	});
 }
 
@@ -340,6 +391,7 @@ $(document).ready(function(){
 					ties: 0,
 				},
 			});
+			//database.ref("chats/" + newSession.key).set([]);
 			createGameRoom(newSession.key);
 		}
 	});
@@ -384,33 +436,7 @@ $(document).ready(function(){
 	});
 
 	$(document).on("click", "#thisCloseButton", function(){
-		var ref = database.ref("sessions/" + currentSession.sessionKey + "/" + currentSession.iAm);
-		ref.remove(function(error){
-			var sessionRef = database.ref("sessions/" + currentSession.sessionKey);
-			sessionRef.once("value", function(snapshot){
-				var session = snapshot.val();
-				if(!(session.player1) && !(session.player2)){
-					sessionRef.remove(function(error){
-						currentSession.sessionKey = null;
-						currentSession.player1 = null;
-						currentSession.iAm = null;
-						currentSession.player2 = null;
-						hideGameRoom();
-						showSessionsTableContainer();
-					});
-				} else {
-					currentSession.sessionKey = null;
-					currentSession.player1 = null;
-					currentSession.iAm = null;
-					currentSession.player2 = null;
-					hideGameRoom();
-					showSessionsTableContainer();
-				}
-			}, function(error){
-				console.log("Error reading session " + currentSession.sessionKey + " during delete of player");
-				console.log(error.code);
-			});
-		});
+		deleteStuff();
 	});
 
 	$(document).on("click", ".myChoice", function(){
@@ -426,8 +452,8 @@ $(document).ready(function(){
 	});
 
 	database.ref("sessions").on("child_changed", function(snapshot){
-		console.log(snapshot);
-		console.log(snapshot.val());
+		//console.log(snapshot);
+		//console.log(snapshot.val());
 		if(snapshot.key === currentSession.sessionKey){
 			var session = snapshot.val();
 			if(currentSession.sessionKey){
@@ -451,6 +477,35 @@ $(document).ready(function(){
 		}
 	}, function(error){
 		console.log("error while listening on session: " + currentSession.sessionKey);
+		console.log(error.code);
+	});
+
+	$(document).on("click", "#messageSendButton", function(event){
+		event.preventDefault();
+		var value = $("#messageTextInput").val().trim();
+		var p = buildChatMessage(authorization.currentUser.email,value);
+		if(currentSession.sessionKey){
+			var ref = database.ref("chats/" + currentSession.sessionKey);
+			ref.push({
+				message: p,
+			});
+		}
+	});
+
+	$("#refreshSessionsTableButton").on("click", function(){
+		buildSessionsTable();
+	});
+
+	database.ref("chats/").on("child_changed", function(snap){
+		console.log("chat key");
+		console.log(snap.key);
+		if(snap.key === currentSession.sessionKey){
+			var chat = snap.val();
+			console.log(chat);
+			buildMessageHistory();
+		}
+	}, function(error){
+		console.log("Error while listening to chats");
 		console.log(error.code);
 	});
 });

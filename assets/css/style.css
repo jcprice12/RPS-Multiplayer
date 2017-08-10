@@ -35,6 +35,11 @@ th{
 	color:#f2f2f2;
 }
 
+p{
+	margin-left: 15px;
+	margin-right: 15px;
+}
+
 
 .box{
 	margin-top: 20px;
@@ -128,6 +133,7 @@ th{
 	height:200px;
 	width:100%;
 	background: #f2f2f2;
+	overflow: scroll;
 }
 
 .messageInput{
