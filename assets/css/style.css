@@ -5,6 +5,7 @@ body{
 
 h1{
 	font-size: 50px;
+	color: #f2f2f2;
 }
 h2{
 	padding:20px;
@@ -40,7 +41,6 @@ p{
 	margin-right: 15px;
 }
 
-
 .box{
 	margin-top: 20px;
 }
@@ -57,28 +57,8 @@ p{
 	color:#f2f2f2;
 }
 
-/*.choiceDiv{
-	padding:15px;
-}*/
-
 .choicesContainer{
 	border-bottom: 1px solid #2f2f2f;
-}
-
-/*.choiceDiv:hover,
-.choiceDiv:active{
-	background:#ccc;
-	cursor:pointer;
-}*/
-
-.myChoice{
-	padding:15px;
-}
-
-.myChoice:hover,
-.myCHoice:active{
-	background:#ccc;
-	cursor:pointer;
 }
 
 .closeButton{
@@ -125,6 +105,7 @@ p{
 	color:#f2f2f2;
 }
 
+
 .messageFormContainer{
 	width:100%;
 }
@@ -151,18 +132,42 @@ p{
 	width:90%;
 }
 
+.myChoice{
+	padding:15px;
+}
+
+.myChoice:hover,
+.myChoice:active{
+	background:#ccc;
+	cursor:pointer;
+}
 
 #myGameRoom{
 	display: none;
 }
 
 #myHeader{
-	/*background-image: url("../images/mochaGrunge.png");*/
 	background:#2f2f2f;
 }
 
 .mySmall{
 	color:#f2f2f2;
+}
+
+.navbar{
+	background-color: #2f2f2f;
+}
+
+#newSessionFormContainer{
+	display: inline-block;
+}
+
+#notLoggedInScreen{
+	text-align: center;
+	width:100%;
+	font-size: 20px;
+	padding: 20px;
+	display: none;
 }
 
 .page-header{
@@ -177,7 +182,30 @@ p{
 	text-align: center;
 }
 
+#refreshSessionsTableButton{
+	display: inline-block;
+	float:right;
+}
+
 .sessionRow:hover{
 	cursor: pointer;
 	background-color: #ccc;
+}
+
+#sessionsTableContainer{
+	display: none;
+	margin-top: 20px;
+}
+
+#userFormContainer{
+	position: relative;
+}
+
+.userInfoInput{
+	display: none;
+}
+
+#userNameP{
+	color:#f2f2f2;
+	margin-right: 10px;
 }

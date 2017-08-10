@@ -416,7 +416,7 @@ $(document).ready(function(){
 					userRef.set({
 						sessionKey: false,
 					});
-					buildSessionsTable();
+					showSessionsTableContainer();
 				} else {
 					var sessionKey = (snap.val()[myUser.uid].sessionKey);
 					if(sessionKey){
@@ -428,14 +428,30 @@ $(document).ready(function(){
 							}
 						});
 					} else {
-						buildSessionsTable();
+						showSessionsTableContainer();
 					}
 				}
 			});
-			//buildSessionsTable();
+			$("#userNameP").text(myUser.email);
+			$("#userNameP").css("display", "inline-block");
+			$("#logOutButton").css("display", "inline-block");
+			$("#emailInput").css("display", "none");
+			$("#passwordInput").css("display", "none");
+			$("#loginButton").css("display", "none");
+			$("#signUpButton").css("display", "none");
+			$("#notLoggedInScreen").css("display", "none");
 		} else {
 			console.log("a user is not logged in");
+			$("#userNameP").html("");
+			$("#userNameP").css("display", "none");
+			$("#logOutButton").css("display", "none");
+			$("#emailInput").css("display", "inline-block");
+			$("#passwordInput").css("display", "inline-block");
+			$("#loginButton").css("display", "inline-block");
+			$("#signUpButton").css("display", "inline-block");
+			$("#notLoggedInScreen").css("display", "inline-block");
 			destroySessionsTableBody();
+			hideSessionsTable();
 		}
 	});
 

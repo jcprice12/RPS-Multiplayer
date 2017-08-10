@@ -12,17 +12,21 @@
 	<div id="myHeader" class="container-fluid">
 		<div class="container">
 			<div class="page-header">
-		  		<h1><small class="mySmall">Rock Paper Scissors</small></h1>
+		  		<h1>Rock Paper Scissors</h1>
+		  		<div id="userFormContainer">
+		  			<div id="userNameP"></div>
+					<input class="userInfoInput" id="emailInput" type="email" placeholder="Email">
+					<input class="userInfoInput" id="passwordInput" type="password" placeholder="Password">
+					<button class="userInfoInput" id="loginButton">Sign In</button>
+					<button class="userInfoInput" id="signUpButton">Sign Up</button>
+					<button class="userInfoInput" id="logOutButton">Sign Out</button>
+				</div>
 		  	</div>
 	  	</div>
 	</div>
 	<div id="bodyContainer" class="container">
-		<div id="userFormContainer">
-			<input id="emailInput" type="email" placeholder="Email">
-			<input id="passwordInput" type="password" placeholder="Password">
-			<button id="loginButton">Sign In</button>
-			<button id="signUpButton">Sign Up</button>
-			<button id="logOutButton">Sign Out</button>
+		<div id="notLoggedInScreen">
+			Please log in or sign up to play.
 		</div>
 		<div id="sessionsTableContainer">
 			<div id="newSessionFormContainer">
@@ -31,7 +35,7 @@
 				<button id="newSessionButton">Submit</button>
 			</div>
 			<button id="refreshSessionsTableButton">
-				Refresh
+				Refresh Table
 			</button>
 			<table id="sessionsTable">
 				<thead>
