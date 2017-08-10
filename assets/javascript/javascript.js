@@ -33,12 +33,12 @@ End Current Session Object
 
 function deleteStuff(){
 	//console.log(currentSession);
-	//var deletePromise = new Promise(function(resolve){
+	var deletePromise = new Promise(function(resolve){
 
-		//var userRef = database.ref("usersInformation/" + authorization.currentUser.uid);
-		//userRef.set({
-		//	sessionKey : false,
-		//});
+		var userRef = database.ref("usersInformation/" + authorization.currentUser.uid);
+		userRef.set({
+			sessionKey : false,
+		});
 		var ref = database.ref("sessions/" + currentSession.sessionKey + "/" + currentSession.iAm);
 		ref.remove(function(error){
 			var sessionRef = database.ref("sessions/" + currentSession.sessionKey);
@@ -75,8 +75,8 @@ function deleteStuff(){
 				console.log(error.code);
 			});
 		});
-	//});
-	//return deletePromise;
+	});
+	return deletePromise;
 }
 
 function buildChatMessage(userEmail, message){
@@ -330,11 +330,11 @@ function enterGameRoom(key, iAmPlayer1){
 	}, function(error){
 		console.log("There was an error while entering the game room");
 		console.log(error.code);
-		//var deletePromise = deleteStuff();
-		//deletePromise.then(function(value){
+		var deletePromise = deleteStuff();
+		deletePromise.then(function(value){
 			//nothing
-		//});
-		deleteStuff();
+		});
+		//deleteStuff();
 	});
 }
 
@@ -361,11 +361,11 @@ function createGameRoom(key){
 	}, function(error){
 		console.log("There was an error while creating a new session and joining the game room");
 		console.log(error.code);
-		//var deletePromise = deleteStuff();
-		// deletePromise.then(function(value){
-		// 	//nothing
-		// });
-		deleteStuff();
+		var deletePromise = deleteStuff();
+		deletePromise.then(function(value){
+			//nothing
+		});
+		//deleteStuff();
 	});
 }
 
@@ -387,41 +387,41 @@ $(document).ready(function(){
 	});
 
 	$("#logOutButton").on("click", function(){
-		// var deletePromise = deleteStuff();
-		// deletePromise.then(function(value){
-		// 	authorization.signOut();
-		// });
-		authorization.signOut();
+		var deletePromise = deleteStuff();
+		deletePromise.then(function(value){
+			authorization.signOut();
+		});
+		//authorization.signOut();
 	});
 
 	authorization.onAuthStateChanged(function(myUser){
 		if(myUser){
 			//console.log(myUser);
 			console.log("user " + myUser.email + " has logged in");
-			// usersRef = database.ref("usersInformation/");
-			// usersRef.once("value", function(snap){
-			// 	if(!(snap.hasChild(myUser.uid))){
-			// 		var userRef = database.ref("usersInformation/").child(myUser.uid);
-			// 		userRef.set({
-			// 			sessionKey: false,
-			// 		});
-			// 		buildSessionsTable();
-			// 	} else {
-			// 		var sessionKey = (snap.val()[myUser.uid].sessionKey);
-			// 		if(sessionKey){
-			// 			database.ref("sessions/" + sessionKey).once("value", function(snapshot){
-			// 				if(snapshot.val().player1.playerEmail === myUser.email){
-			// 					enterGameRoom(sessionKey,true);
-			// 				} else {
-			// 					enterGameRoom(sessionKey, false);
-			// 				}
-			// 			});
-			// 		} else {
-			// 			buildSessionsTable();
-			// 		}
-			// 	}
-			// });
-			buildSessionsTable();
+			usersRef = database.ref("usersInformation/");
+			usersRef.once("value", function(snap){
+				if(!(snap.hasChild(myUser.uid))){
+					var userRef = database.ref("usersInformation/").child(myUser.uid);
+					userRef.set({
+						sessionKey: false,
+					});
+					buildSessionsTable();
+				} else {
+					var sessionKey = (snap.val()[myUser.uid].sessionKey);
+					if(sessionKey){
+						database.ref("sessions/" + sessionKey).once("value", function(snapshot){
+							if(snapshot.val().player1.playerEmail === myUser.email){
+								enterGameRoom(sessionKey,true);
+							} else {
+								enterGameRoom(sessionKey, false);
+							}
+						});
+					} else {
+						buildSessionsTable();
+					}
+				}
+			});
+			//buildSessionsTable();
 		} else {
 			console.log("a user is not logged in");
 			destroySessionsTableBody();
@@ -443,10 +443,10 @@ $(document).ready(function(){
 				},
 			});
 
-			//var userRef = database.ref("usersInformation/" + authorization.currentUser.uid);
-			//userRef.set({
-			//	sessionKey: newSession.key,
-			//});
+			var userRef = database.ref("usersInformation/" + authorization.currentUser.uid);
+			userRef.set({
+				sessionKey: newSession.key,
+			});
 			// var playerRef = database.ref("sessions/" + newSession.key + "/player1/");
 			// playerRef.onDisconnect().remove(function(error){
 			// 	if(!currentSession.player2){
@@ -465,7 +465,7 @@ $(document).ready(function(){
 			var user = authorization.currentUser;
 			var email = user.email;
 			if(!snapshot.hasChild("player1")){
-				if(snapshot.val().player2.playerEmail !== email){
+				//if(snapshot.val().player2.playerEmail !== email){
 					var player1 = database.ref(sessionRef).child("player1");
 					player1.set({
 						playerEmail: email,
@@ -475,10 +475,10 @@ $(document).ready(function(){
 						ties: 0,
 					});
 
-					//var userRef = database.ref("usersInformation/" + user.uid);
-					//userRef.set({
-					//	sessionKey: key,
-					//});
+					var userRef = database.ref("usersInformation/" + user.uid);
+					userRef.set({
+						sessionKey: key,
+					});
 					// player1.onDisconnect().remove(function(error){
 					// 	if(!currentSession.player2){
 					// 		var mySessionRef = database.ref("sessions/" + newSession.key);
@@ -486,9 +486,9 @@ $(document).ready(function(){
 					// 	}
 					// });
 					enterGameRoom(key,true);					
-				}
+				//}
 			} else if(!snapshot.hasChild("player2")){
-				if(snapshot.val().player1.playerEmail !== email){
+				//if(snapshot.val().player1.playerEmail !== email){
 					var player2 = database.ref(sessionRef).child("player2");
 					player2.set({
 						playerEmail: email,
@@ -498,10 +498,10 @@ $(document).ready(function(){
 						ties: 0,
 					});
 
-					//var userRef = database.ref("usersInformation/" + user.uid);
-					//userRef.set({
-					//	sessionKey: key,
-					//});
+					var userRef = database.ref("usersInformation/" + user.uid);
+					userRef.set({
+						sessionKey: key,
+					});
 					// player2.onDisconnect().remove(function(error){
 					// 	if(!currentSession.player1){
 					// 		var mySessionRef = database.ref("sessions/" + newSession.key);
@@ -509,7 +509,7 @@ $(document).ready(function(){
 					// 	}
 					// });
 					enterGameRoom(key,false);
-				}
+				//}
 			} else {
 				buildSessionsTable();
 				alert("You cannot join " + snapshot.val().name + ". There are already two players in the game room.");
@@ -521,11 +521,11 @@ $(document).ready(function(){
 	});
 
 	$(document).on("click", "#thisCloseButton", function(){
-		// var deletePromise = deleteStuff();
-		// deletePromise.then(function(value){
-		// 	buildSessionsTable();
-		// });
-		deleteStuff();
+		var deletePromise = deleteStuff();
+		deletePromise.then(function(value){
+			buildSessionsTable();
+		});
+		//deleteStuff();
 	});
 
 	$(document).on("click", ".myChoice", function(){
@@ -606,18 +606,4 @@ $(document).ready(function(){
 		console.log("Error while listening to chats");
 		console.log(error.code);
 	});
-
-	// var connectedRef = database.ref(".info/connected");
-	// // When the client's connection state changes...
-	// connectedRef.on("value", function(snap) {
-
-	//   // If they are connected..
-	//   if (snap.val()) {
-	//   	console.log("connected")
-	//     // Add user to the connections list.
-	//     //var con = connectionsRef.push(true);
-	//     // Remove user from the connection list when they disconnect.
-	//     con.onDisconnect().remove();
-	//   }
-	// });
 });
