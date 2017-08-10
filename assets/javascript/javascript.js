@@ -32,42 +32,51 @@ End Current Session Object
 **********************************************************************************************************/
 
 function deleteStuff(){
-	var ref = database.ref("sessions/" + currentSession.sessionKey + "/" + currentSession.iAm);
-	ref.remove(function(error){
-		var sessionRef = database.ref("sessions/" + currentSession.sessionKey);
-		sessionRef.once("value", function(snapshot){
-			var session = snapshot.val();
-			if(!(session.player1) && !(session.player2)){
-				sessionRef.remove(function(error){
-					var chatRef = database.ref("chats/" + currentSession.sessionKey);
-					chatRef.remove(function(error){
-						currentSession.sessionName = null;
-						currentSession.sessionKey = null;
-						currentSession.player1 = null;
-						currentSession.iAm = null;
-						currentSession.player2 = null;
-						hideGameRoom();
-						showSessionsTableContainer();
-						console.log("deleted entire session and chat");
-						console.log(currentSession);
+	//console.log(currentSession);
+	//var deletePromise = new Promise(function(resolve){
+
+		//var userRef = database.ref("usersInformation/" + authorization.currentUser.uid);
+		//userRef.set({
+		//	sessionKey : false,
+		//});
+		var ref = database.ref("sessions/" + currentSession.sessionKey + "/" + currentSession.iAm);
+		ref.remove(function(error){
+			var sessionRef = database.ref("sessions/" + currentSession.sessionKey);
+			sessionRef.once("value", function(snapshot){
+				var session = snapshot.val();
+				if(!(session.player1) && !(session.player2)){
+					sessionRef.remove(function(error){
+						var chatRef = database.ref("chats/" + currentSession.sessionKey);
+						chatRef.remove(function(error){
+							currentSession.sessionName = null;
+							currentSession.sessionKey = null;
+							currentSession.player1 = null;
+							currentSession.iAm = null;
+							currentSession.player2 = null;
+							hideGameRoom();
+							showSessionsTableContainer();
+							console.log("deleted entire session and chat");
+							console.log(currentSession);
+						});
 					});
-				});
-			} else {
-				currentSession.sessionName = null;
-				currentSession.sessionKey = null;
-				currentSession.player1 = null;
-				currentSession.iAm = null;
-				currentSession.player2 = null;
-				hideGameRoom();
-				showSessionsTableContainer();
-				console.log("deleted player from session");
-				console.log(currentSession);
-			}
-		}, function(error){
-			console.log("Error reading session " + currentSession.sessionKey + " during delete of player");
-			console.log(error.code);
+				} else {
+					currentSession.sessionName = null;
+					currentSession.sessionKey = null;
+					currentSession.player1 = null;
+					currentSession.iAm = null;
+					currentSession.player2 = null;
+					hideGameRoom();
+					showSessionsTableContainer();
+					console.log("deleted player from session");
+					console.log(currentSession);
+				}
+			}, function(error){
+				console.log("Error reading session " + currentSession.sessionKey + " during delete of player");
+				console.log(error.code);
+			});
 		});
-	});
+	//});
+	//return deletePromise;
 }
 
 function buildChatMessage(userEmail, message){
@@ -125,6 +134,7 @@ function buildChoice(choice){
 
 function buildPlayerInformation(player){
 	console.log("building player info:");
+	console.log(player);
 	var playerInfo = $("<div>");
 	playerInfo.addClass("playerInformationContainer");
 	if(player){
@@ -140,6 +150,7 @@ function buildPlayerInformation(player){
 }
 
 function buildOtherChoiceSection(myMessage){
+	console.log("building other choice container");
 	var choiceContainer = $("<div>");
 	choiceContainer.addClass("choicesContainer");
 	var message = $("<div>");
@@ -160,6 +171,8 @@ function buildChoiceContainer(){
 
 function buildPlayerBoxBody(boxBody, player, amPlayer, message){
 	boxBody.html("");
+	console.log("building box body");
+	console.log(player);
 	if(player){
 		if(amPlayer){
 			boxBody.append(buildChoiceContainer());
@@ -241,8 +254,10 @@ function updatePlayer1Info(){
 		if(currentSession.iAm === "player1"){
 			buildPlayerBoxBody($("#player1BoxBody"),player1,true, "");
 		} else {
-			if(player1.choice){
-				buildPlayerBoxBody($("#player2BoxBody"),player1,false, player1.playerEmail + " has chosen");
+			console.log("am not player 1");
+			console.log(currentSession);
+			if((player1.choice === "rock") || (player1.choice === "paper") || (player1.choice === "scissors")){
+				buildPlayerBoxBody($("#player1BoxBody"),player1,false, player1.playerEmail + " has chosen");
 			} else{
 				buildPlayerBoxBody($("#player1BoxBody"),player1,false, "Choosing Move");
 			}
@@ -315,6 +330,10 @@ function enterGameRoom(key, iAmPlayer1){
 	}, function(error){
 		console.log("There was an error while entering the game room");
 		console.log(error.code);
+		//var deletePromise = deleteStuff();
+		//deletePromise.then(function(value){
+			//nothing
+		//});
 		deleteStuff();
 	});
 }
@@ -342,6 +361,10 @@ function createGameRoom(key){
 	}, function(error){
 		console.log("There was an error while creating a new session and joining the game room");
 		console.log(error.code);
+		//var deletePromise = deleteStuff();
+		// deletePromise.then(function(value){
+		// 	//nothing
+		// });
 		deleteStuff();
 	});
 }
@@ -364,12 +387,40 @@ $(document).ready(function(){
 	});
 
 	$("#logOutButton").on("click", function(){
+		// var deletePromise = deleteStuff();
+		// deletePromise.then(function(value){
+		// 	authorization.signOut();
+		// });
 		authorization.signOut();
 	});
 
 	authorization.onAuthStateChanged(function(myUser){
 		if(myUser){
+			//console.log(myUser);
 			console.log("user " + myUser.email + " has logged in");
+			// usersRef = database.ref("usersInformation/");
+			// usersRef.once("value", function(snap){
+			// 	if(!(snap.hasChild(myUser.uid))){
+			// 		var userRef = database.ref("usersInformation/").child(myUser.uid);
+			// 		userRef.set({
+			// 			sessionKey: false,
+			// 		});
+			// 		buildSessionsTable();
+			// 	} else {
+			// 		var sessionKey = (snap.val()[myUser.uid].sessionKey);
+			// 		if(sessionKey){
+			// 			database.ref("sessions/" + sessionKey).once("value", function(snapshot){
+			// 				if(snapshot.val().player1.playerEmail === myUser.email){
+			// 					enterGameRoom(sessionKey,true);
+			// 				} else {
+			// 					enterGameRoom(sessionKey, false);
+			// 				}
+			// 			});
+			// 		} else {
+			// 			buildSessionsTable();
+			// 		}
+			// 	}
+			// });
 			buildSessionsTable();
 		} else {
 			console.log("a user is not logged in");
@@ -391,6 +442,18 @@ $(document).ready(function(){
 					ties: 0,
 				},
 			});
+
+			//var userRef = database.ref("usersInformation/" + authorization.currentUser.uid);
+			//userRef.set({
+			//	sessionKey: newSession.key,
+			//});
+			// var playerRef = database.ref("sessions/" + newSession.key + "/player1/");
+			// playerRef.onDisconnect().remove(function(error){
+			// 	if(!currentSession.player2){
+			// 		var mySessionRef = database.ref("sessions/" + newSession.key);
+			// 		mySessionRef.remove();
+			// 	}
+			// });
 			createGameRoom(newSession.key);
 		}
 	});
@@ -411,7 +474,18 @@ $(document).ready(function(){
 						losses: 0,
 						ties: 0,
 					});
-					enterGameRoom(key,true);
+
+					//var userRef = database.ref("usersInformation/" + user.uid);
+					//userRef.set({
+					//	sessionKey: key,
+					//});
+					// player1.onDisconnect().remove(function(error){
+					// 	if(!currentSession.player2){
+					// 		var mySessionRef = database.ref("sessions/" + newSession.key);
+					// 		mySessionRef.remove();
+					// 	}
+					// });
+					enterGameRoom(key,true);					
 				}
 			} else if(!snapshot.hasChild("player2")){
 				if(snapshot.val().player1.playerEmail !== email){
@@ -423,6 +497,17 @@ $(document).ready(function(){
 						losses: 0,
 						ties: 0,
 					});
+
+					//var userRef = database.ref("usersInformation/" + user.uid);
+					//userRef.set({
+					//	sessionKey: key,
+					//});
+					// player2.onDisconnect().remove(function(error){
+					// 	if(!currentSession.player1){
+					// 		var mySessionRef = database.ref("sessions/" + newSession.key);
+					// 		mySessionRef.remove();
+					// 	}
+					// });
 					enterGameRoom(key,false);
 				}
 			} else {
@@ -436,8 +521,11 @@ $(document).ready(function(){
 	});
 
 	$(document).on("click", "#thisCloseButton", function(){
+		// var deletePromise = deleteStuff();
+		// deletePromise.then(function(value){
+		// 	buildSessionsTable();
+		// });
 		deleteStuff();
-		buildSessionsTable();
 	});
 
 	$(document).on("click", ".myChoice", function(){
@@ -495,9 +583,8 @@ $(document).ready(function(){
 		buildSessionsTable();
 	});
 
-	database.ref("chats/").on("child_added", function(snap){
-		console.log("chat key");
-		console.log(snap.key);
+	database.ref("chats/").on("child_changed", function(snap){
+		console.log("chats has been added");
 		if(snap.key === currentSession.sessionKey){
 			var chat = snap.val();
 			console.log(chat);
@@ -507,4 +594,30 @@ $(document).ready(function(){
 		console.log("Error while listening to chats");
 		console.log(error.code);
 	});
+
+	database.ref("chats/").on("child_added", function(snap){
+		console.log("chats has been added");
+		if(snap.key === currentSession.sessionKey){
+			var chat = snap.val();
+			console.log(chat);
+			buildMessageHistory();
+		}
+	}, function(error){
+		console.log("Error while listening to chats");
+		console.log(error.code);
+	});
+
+	// var connectedRef = database.ref(".info/connected");
+	// // When the client's connection state changes...
+	// connectedRef.on("value", function(snap) {
+
+	//   // If they are connected..
+	//   if (snap.val()) {
+	//   	console.log("connected")
+	//     // Add user to the connections list.
+	//     //var con = connectionsRef.push(true);
+	//     // Remove user from the connection list when they disconnect.
+	//     con.onDisconnect().remove();
+	//   }
+	// });
 });
