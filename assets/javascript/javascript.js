@@ -55,13 +55,13 @@ function deleteStuff(signOut){
 								currentSession.player1 = null;
 								currentSession.iAm = null;
 								currentSession.player2 = null;
+								hideGameRoom();
+								showSessionsTableContainer();
 								if(signOut){
 									authorization.signOut();
 								}
-								hideGameRoom();
-								showSessionsTableContainer();
-								console.log("deleted entire session and chat");
-								console.log(currentSession);
+								// console.log("deleted entire session and chat");
+								// console.log(currentSession);
 							});
 						});
 					} else {
