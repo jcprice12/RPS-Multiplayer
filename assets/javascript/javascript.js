@@ -391,7 +391,6 @@ $(document).ready(function(){
 					ties: 0,
 				},
 			});
-			//database.ref("chats/" + newSession.key).set([]);
 			createGameRoom(newSession.key);
 		}
 	});
@@ -427,6 +426,7 @@ $(document).ready(function(){
 					enterGameRoom(key,false);
 				}
 			} else {
+				buildSessionsTable();
 				alert("You cannot join " + snapshot.val().name + ". There are already two players in the game room.");
 			}
 		}, function(error){
@@ -437,6 +437,7 @@ $(document).ready(function(){
 
 	$(document).on("click", "#thisCloseButton", function(){
 		deleteStuff();
+		buildSessionsTable();
 	});
 
 	$(document).on("click", ".myChoice", function(){
@@ -452,8 +453,6 @@ $(document).ready(function(){
 	});
 
 	database.ref("sessions").on("child_changed", function(snapshot){
-		//console.log(snapshot);
-		//console.log(snapshot.val());
 		if(snapshot.key === currentSession.sessionKey){
 			var session = snapshot.val();
 			if(currentSession.sessionKey){
@@ -496,7 +495,7 @@ $(document).ready(function(){
 		buildSessionsTable();
 	});
 
-	database.ref("chats/").on("child_changed", function(snap){
+	database.ref("chats/").on("child_added", function(snap){
 		console.log("chat key");
 		console.log(snap.key);
 		if(snap.key === currentSession.sessionKey){
