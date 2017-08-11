@@ -343,6 +343,58 @@ function enterGameRoom(key, iAmPlayer1){
 		$("#resultContent").text("");
 		buildMessageHistory();
 		showGameRoom();
+
+		firebase.database().ref("sessions/").on("child_changed", function(snapshot){
+			console.log("sessions changed");
+			if(currentSession.sessionKey){
+				if(snapshot.key === currentSession.sessionKey){
+					var session = snapshot.val();			
+					currentSession.player1 = session.player1;
+					updatePlayer1Info();
+					currentSession.player2 = session.player2
+					updatePlayer2Info();
+					if(session.player1 && session.player2){
+						if(session.player1.choice && session.player2.choice){
+							compareChoices(currentSession, session.player1.choice, session.player2.choice);
+							database.ref("sessions/" + currentSession.sessionKey).set({
+								name: currentSession.sessionName,
+								player1: currentSession.player1,
+								player2: currentSession.player2,
+							});
+						} else {
+							console.log("waiting for both users to choose still");
+						}
+					}			
+				}
+			}
+		}, function(error){
+			console.log("error while listening on session: " + currentSession.sessionKey);
+			console.log(error.code);
+		});
+
+		database.ref("chats/").on("child_changed", function(snap){
+			console.log("chats has been added");
+			if(snap.key === currentSession.sessionKey){
+				var chat = snap.val();
+				console.log(chat);
+				buildMessageHistory();
+			}
+		}, function(error){
+			console.log("Error while listening to chats");
+			console.log(error.code);
+		});
+
+		database.ref("chats/").on("child_added", function(snap){
+			console.log("chats has been added");
+			if(snap.key === currentSession.sessionKey){
+				var chat = snap.val();
+				console.log(chat);
+				buildMessageHistory();
+			}
+		}, function(error){
+			console.log("Error while listening to chats");
+			console.log(error.code);
+		});
 		
 	}, function(error){
 		console.log("There was an error while entering the game room");
@@ -370,6 +422,58 @@ function createGameRoom(key){
 		$("#resultContent").text("");
 		buildMessageHistory();
 		showGameRoom();
+
+		firebase.database().ref("sessions/").on("child_changed", function(snapshot){
+			console.log("sessions changed");
+			if(currentSession.sessionKey){
+				if(snapshot.key === currentSession.sessionKey){
+					var session = snapshot.val();			
+					currentSession.player1 = session.player1;
+					updatePlayer1Info();
+					currentSession.player2 = session.player2
+					updatePlayer2Info();
+					if(session.player1 && session.player2){
+						if(session.player1.choice && session.player2.choice){
+							compareChoices(currentSession, session.player1.choice, session.player2.choice);
+							database.ref("sessions/" + currentSession.sessionKey).set({
+								name: currentSession.sessionName,
+								player1: currentSession.player1,
+								player2: currentSession.player2,
+							});
+						} else {
+							console.log("waiting for both users to choose still");
+						}
+					}			
+				}
+			}
+		}, function(error){
+			console.log("error while listening on session: " + currentSession.sessionKey);
+			console.log(error.code);
+		});
+
+		database.ref("chats/").on("child_changed", function(snap){
+			console.log("chats has been added");
+			if(snap.key === currentSession.sessionKey){
+				var chat = snap.val();
+				console.log(chat);
+				buildMessageHistory();
+			}
+		}, function(error){
+			console.log("Error while listening to chats");
+			console.log(error.code);
+		});
+
+		database.ref("chats/").on("child_added", function(snap){
+			console.log("chats has been added");
+			if(snap.key === currentSession.sessionKey){
+				var chat = snap.val();
+				console.log(chat);
+				buildMessageHistory();
+			}
+		}, function(error){
+			console.log("Error while listening to chats");
+			console.log(error.code);
+		});
 
 	}, function(error){
 		console.log("There was an error while creating a new session and joining the game room");
@@ -401,7 +505,6 @@ $(document).ready(function(){
 
 	authorization.onAuthStateChanged(function(myUser){
 		if(myUser){
-
 			console.log("user " + myUser.email + " has logged in");
 			usersRef = database.ref("usersInformation/");
 			usersRef.once("value", function(snap){
@@ -425,6 +528,8 @@ $(document).ready(function(){
 						showSessionsTableContainer();
 					}
 				}
+			}, function(error){
+				console.log(error.code);
 			});
 			$("#userNameP").text(myUser.email);
 			$("#userNameP").css("display", "inline-block");
@@ -573,29 +678,6 @@ $(document).ready(function(){
 		}
 	});
 
-	// database.ref("sessions/").on("value", function(snapshot){
-	// 	var sessions = snapshot.val();
-	// 	if(currentSession.sessionKey){
-	// 		var session = sessions[currentSession];
-	// 		currentSession.player1 = session.player1;
-	// 		updatePlayer1Info();
-	// 		currentSession.player2 = session.player2
-	// 		updatePlayer2Info();
-	// 		if(session.player1 && session.player2){
-	// 			if(session.player1.choice && session.player2.choice){
-	// 				compareChoices(currentSession, session.player1.choice, session.player2.choice);
-	// 				database.ref("sessions/" + currentSession.sessionKey).set({
-	// 					name: currentSession.sessionName,
-	// 					player1: currentSession.player1,
-	// 					player2: currentSession.player2,
-	// 				});
-	// 			} else {
-	// 				console.log("waiting for both users to choose still");
-	// 			}
-	// 		}
-	// 	}
-	// });
-
 	firebase.database().ref("sessions/").on("child_changed", function(snapshot){
 		console.log("sessions changed");
 		if(currentSession.sessionKey){
@@ -626,7 +708,33 @@ $(document).ready(function(){
 
 
 	$(document).on("click", "#messageSendButton", function(event){
+
 		event.preventDefault();
+
+		database.ref("chats/").on("child_changed", function(snap){
+			console.log("chats has been added");
+			if(snap.key === currentSession.sessionKey){
+				var chat = snap.val();
+				console.log(chat);
+				buildMessageHistory();
+			}
+		}, function(error){
+			console.log("Error while listening to chats");
+			console.log(error.code);
+		});
+
+		database.ref("chats/").on("child_added", function(snap){
+			console.log("chats has been added");
+			if(snap.key === currentSession.sessionKey){
+				var chat = snap.val();
+				console.log(chat);
+				buildMessageHistory();
+			}
+		}, function(error){
+			console.log("Error while listening to chats");
+			console.log(error.code);
+		});
+
 		var value = $("#messageTextInput").val().trim();
 		var p = buildChatMessage(authorization.currentUser.email,value);
 		if(currentSession.sessionKey){
